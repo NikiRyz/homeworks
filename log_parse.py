@@ -3,12 +3,12 @@ from datetime import datetime, date, time
 from collections import defaultdict
 
 
-def parse_urls_without_files(log):
+def fun1(log):
     parser = re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
     return parser
 
 
-def parse_urls(log):
+def fun2(log):
     parser = re.search('(?<=//)[\w]*:?[\w]*@?[\w]*:?[\d]*[/]?[^?\s]*', log)
     if parser:
         return parser.group(0)
@@ -23,11 +23,11 @@ def parse_ignore_urls(log, ignore_urls):
         return False
 
 
-def parse_urls_without_www(log):
+def fun_www(log):
     return re.sub(r"(?<=://)www.", "", log)
 
 
-def start_at_time(log, start):
+def start(log, start):
     parser = re.search("(?<=\[)\d{2}/\w+/\w{4}\s\w+:\w+:\w+", log)
     if parser:
         date_from_log = datetime.strptime(parser.group(0), '%d/%b/%Y %H:%M:%S')
@@ -38,7 +38,7 @@ def start_at_time(log, start):
             return False
 
 
-def stop_at_time(log, stop):
+def stop(log, stop):
     parser = re.search("(?<=\[)\d{2}/\w+/\w{4}\s\w+:\w+:\w+", log)
     if parser:
         date_from_log = datetime.strptime(parser.group(0), '%d/%b/%Y %H:%M:%S')
@@ -48,7 +48,7 @@ def stop_at_time(log, stop):
             return False
 
 
-def parse_urls_slow_quire(log):
+def slow(log):
     parser = re.search('(?<=://).*\s([\d]+)(?=\n)', log)
     if parser:
         edit_parser = re.search('^[\w]*:?[\w]*@?[\w]*:?[\d]*[/]?[^?\s]*', parser.group(1))
@@ -79,31 +79,31 @@ def parse(
     with open('log.log') as f:
         for line in f:
             if ignore_files:
-                if parse_urls_without_files(line):
+                if fun1(line):
                     continue
             if ignore_urls:
-                if parse_ignore_urls(line, ignore_urls):
+                if fun2(line, ignore_urls):
                     continue
             if ignore_www:
-                line = parse_urls_without_www(line) if parse_urls_without_www(line) else line
+                line = fun_www(line) if fun_www(line) else line
             if start_at:
-                if start_at_time(line, start_at):
+                if start(line, start_at):
                     continue
             if stop_at:
-                if stop_at_time(line, stop_at):
+                if stop(line, stop_at):
                     continue
             if request_type:
                 if parse_by_request_type(line, request_type):
                     continue
 
             if slow_queries:
-                if parse_urls_slow_quire(line):
-                    urls[parse_urls(line)]['querie_time'] += int(parse_urls_slow_quire(line))
-                    urls[parse_urls(line)]['count'] += 1
+                if slow(line):
+                    urls[fun2(line)]['querie_time'] += int(slow(line))
+                    urls[fun2(line)]['count'] += 1
 
             else:
-                if parse_urls(line):
-                    urls[parse_urls(line)]['count'] += 1
+                if fun2(line):
+                    urls[fun2(line)]['count'] += 1
     res = list()
     if slow_queries:
         for val in urls.values():
