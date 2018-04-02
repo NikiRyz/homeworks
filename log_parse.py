@@ -3,29 +3,12 @@ from datetime import datetime, date, time
 from collections import defaultdict
 
 
-def parse_urls_without_files(log):
-    g = re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
-    return g
-
-
 def parse_urls(log):
     parser = re.search('(?<=//)[\w]*:?[\w]*@?[\w]*:?[\d]*[/]?[^?\s]*', log)
     if parser:
         return parser.group(0)
     else:
         return None
-
-
-def parse_ignore_urls(log, ignore_urls):
-    if log in ignore_urls:
-        return True
-    else:
-        return False
-
-
-def parse_urls_without_www(log):
-    return re.sub(r"(?<=://)www.", "", log)
-
 
 def start(log, start):
     parser = re.search("(?<=\[)\d{2}/\w+/\w{4}\s\w+:\w+:\w+", log)
@@ -72,13 +55,12 @@ def parse(
     with open('log.log') as p:
         for line in p:
             if ignore_files:
-                if parse_urls_without_files(line):
-                    continue
+                g = lambda log,line:re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
             if ignore_urls:
-                if parse_ignore_urls(line, ignore_urls):
-                    continue
+                f = lambda log, line, ignore_urls: True if log in ignore_urls else False
             if ignore_www:
-                line = parse_urls_without_www(line) if parse_urls_without_www(line) else line
+                c= lambda log:re.sub(r"(?<=://)www.", "", log)
+                line = c(line) if c(line) else line
             if start_at:
                 if start(line, start_at):
                     continue
