@@ -4,8 +4,8 @@ from collections import defaultdict
 
 
 def parse_urls_without_files(log):
-    parser = re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
-    return parser
+    g = re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
+    return g
 
 
 def parse_urls(log):
