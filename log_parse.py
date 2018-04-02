@@ -3,12 +3,12 @@ from datetime import datetime, date, time
 from collections import defaultdict
 
 
-def fun1(log):
+def parse_urls_without_files(log):
     parser = re.search(r"(?<=./)[-.\w]+[.]\w+(?=[?\s])", log)
     return parser
 
 
-def fun2(log):
+def parse_urls(log):
     parser = re.search('(?<=//)[\w]*:?[\w]*@?[\w]*:?[\d]*[/]?[^?\s]*', log)
     if parser:
         return parser.group(0)
@@ -23,7 +23,7 @@ def parse_ignore_urls(log, ignore_urls):
         return False
 
 
-def fun_www(log):
+def parse_urls_without_www(log):
     return re.sub(r"(?<=://)www.", "", log)
 
 
@@ -31,24 +31,17 @@ def start(log, start):
     parser = re.search("(?<=\[)\d{2}/\w+/\w{4}\s\w+:\w+:\w+", log)
     if parser:
         date_from_log = datetime.strptime(parser.group(0), '%d/%b/%Y %H:%M:%S')
-        if start > date_from_log:
-            return True
-        else:
-
-            return False
+        return start>date_from_log
 
 
 def stop(log, stop):
     parser = re.search("(?<=\[)\d{2}/\w+/\w{4}\s\w+:\w+:\w+", log)
     if parser:
         date_from_log = datetime.strptime(parser.group(0), '%d/%b/%Y %H:%M:%S')
-        if stop < date_from_log:
-            return True
-        else:
-            return False
+        return stop < date_from_log
 
 
-def slow(log):
+def parse_urls_slow_quire(log):
     parser = re.search('(?<=://).*\s([\d]+)(?=\n)', log)
     if parser:
         edit_parser = re.search('^[\w]*:?[\w]*@?[\w]*:?[\d]*[/]?[^?\s]*', parser.group(1))
@@ -76,16 +69,16 @@ def parse(
         slow_queries=False
 ):
     urls = defaultdict(lambda: {'querie_time': 0, 'count': 0})
-    with open('log.log') as f:
-        for line in f:
+    with open('log.log') as p:
+        for line in p:
             if ignore_files:
-                if fun1(line):
+                if parse_urls_without_files(line):
                     continue
             if ignore_urls:
-                if fun2(line, ignore_urls):
+                if parse_ignore_urls(line, ignore_urls):
                     continue
             if ignore_www:
-                line = fun_www(line) if fun_www(line) else line
+                line = parse_urls_without_www(line) if parse_urls_without_www(line) else line
             if start_at:
                 if start(line, start_at):
                     continue
@@ -97,13 +90,13 @@ def parse(
                     continue
 
             if slow_queries:
-                if slow(line):
-                    urls[fun2(line)]['querie_time'] += int(slow(line))
-                    urls[fun2(line)]['count'] += 1
+                if parse_urls_slow_quire(line):
+                    urls[parse_urls(line)]['querie_time'] += int(parse_urls_slow_quire(line))
+                    urls[parse_urls(line)]['count'] += 1
 
             else:
-                if fun2(line):
-                    urls[fun2(line)]['count'] += 1
+                if parse_urls(line):
+                    urls[parse_urls(line)]['count'] += 1
     res = list()
     if slow_queries:
         for val in urls.values():
