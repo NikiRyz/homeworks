@@ -25,7 +25,7 @@ class Match:
         self._current_player_index = 0
         self._results = []
         self._current_hole = 0
-        self.finished = False
+        self.finish = False
         for _ in range(holes):
             hole_results = []
             for player in players:
@@ -33,8 +33,8 @@ class Match:
             self._results.append(hole_results)
 
     @property
-    def finished(self):
-        return self._finished
+    def finish(self):
+        return self._finish
 
 
     def _change_player_order(self):
@@ -42,9 +42,9 @@ class Match:
         tail = self._active_players_names[:self._current_hole % len(self._players)]
         self._active_players_names = self._active_players_names[self._current_hole % len(self._players):] + tail
 
-    @finished.setter
-    def finished(self, value):
-        self._finished = value
+    @finish.setter
+    def finish(self, value):
+        self._finish = value
 
     def hit(self, success):
         pass
@@ -53,7 +53,7 @@ class Match:
         pass
 
     def get_winners(self):
-        if self.finished:
+        if self.finish:
             winners = [{'player': player, 'score': 0} for player in self._players]
             for match in self._results:
                 for index, kick in enumerate(match):
