@@ -36,7 +36,7 @@ class Match:
     def finished(self):
         return self._finished
 
-    # функция, меняющая порядок игроков
+
     def _change_player_order(self):
         self._active_players_names = [player._name for player in self._players]
         tail = self._active_players_names[:self._current_hole % len(self._players)]
@@ -192,7 +192,6 @@ class HolesMatch(Match):
             raise RuntimeError
 
     def _check(self, ):
-        # если все ударили, то смотрим, есть ли кто забил
         if self._current_player_index + 1 == len(self._active_players_names):
             if self._winners_names:
                 for player_match in self._results[self._current_hole]:
