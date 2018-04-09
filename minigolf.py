@@ -21,12 +21,11 @@ class Match:
             raise TypeError
         self._holes = holes
         self._players = players
-        self._active_players_names = [player._name for player in players]  # игроки, играющие на лунке
-        self._current_player_index = 0  # индекс текущего игрока
+        self._active_players_names = [player._name for player in players]
+        self._current_player_index = 0
         self._results = []
-        self._current_hole = 0  # текущая лунка
+        self._current_hole = 0
         self.finished = False
-        # заполнение _results 0
         for _ in range(holes):
             hole_results = []
             for player in players:
@@ -75,9 +74,7 @@ class Match:
 class HitsMatch(Match):
     LAST_KICK = 10
 
-    # функция проверяющая, закончилась ли  игра на лунке или нет
     def _check(self, change):
-        # если все забили, то переход на следующую лунку
         if not self._active_players_names:
             self._current_player_index = 0
             self._active_players_names = [player._name for player in self._players]
@@ -153,7 +150,6 @@ class HolesMatch(Match):
         self._winners_names = []
         self._number_of_kick = 0
         self._results = []
-        # переопределение _results заполнение его None
         for _ in range(holes):
             hole_results = []
             for player in players:
